@@ -7,10 +7,22 @@ var builder = WebApplication.CreateBuilder(args);
 //dotnet add package Pomelo.EntityFrameworkCore.MySql
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
 builder.Services.AddControllers(); // Asegúrate de que los controladores estén registrados
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "api",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
+builder.Services.AddEndpointsApiExplorer();
 
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -35,9 +47,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseRouting(); // Asegúrate de que el enrutamiento esté configurado
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseCors("api");
 
 app.MapControllers(); // Asegúrate de que los controladores estén mapeados
 
